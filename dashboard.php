@@ -49,7 +49,8 @@ $current_date = date("Y-m-d");
     </style>
 </head>
 <body>
-    
+
+
     <h2>Clinic office</h2>
     <table>
         <tr>
