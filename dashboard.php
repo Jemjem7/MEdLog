@@ -40,30 +40,167 @@ $prescriptions = $_SESSION['prescriptions'];
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard</title>
   <style>
-    body { font-family: Arial, sans-serif; margin:0; background:#f5f5f5; display:flex; }
-    .sidebar { width:250px; background:#4b7c67; height:100vh; position:fixed; top:0; padding:20px; color:white; transition:transform .3s; }
-    .sidebar.hidden { transform:translateX(-100%); }
-    .sidebar h3 { margin:0 0 30px; color:black; }
-    .sidebar a { color:white; text-decoration:none; margin-bottom:20px; display:block; }
-    .main-content { margin-left:250px; flex:1; transition:margin-left .3s; }
-    .main-content.full { margin-left:0; }
-    .header { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,.1); position:sticky; top:0; z-index:1001; }
-    .burger { font-size:24px; cursor:pointer; }
-    .search-bar { padding:5px 10px; border:1px solid #ccc; border-radius:4px; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; padding:20px; }
-    .card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.1); }
-    .status { font-size:14px; }
-    .status.red { color:red; }
-    .weekly-chart { background:#fff; padding:20px; margin:20px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.1); }
-    table { width:100%; border-collapse:collapse; margin-top:20px; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,.1); }
-    th,td { padding:10px; border-bottom:1px solid #eee; text-align:left; }
-    th { background:#444; color:white; }
-    .delete-btn { background:red; color:#fff; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; }
-    .logout-button { margin:20px; text-align:right; }
-    .logout-button button { padding:10px 20px; background:green; color:#fff; border:none; border-radius:4px; cursor:pointer; }
-    form input { margin-right:10px; padding:8px; border:1px solid #ccc; border-radius:4px; }
-    form button { padding:8px 16px; background:#4b7c67; color:#fff; border:none; border-radius:4px; cursor:pointer; }
-  </style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f5f5f5;
+    display: flex;
+  }
+
+  .sidebar {
+    width: 250px;
+    background: #4b7c67;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    padding: 20px;
+    color: white;
+    transition: transform 0.3s;
+  }
+
+  .sidebar.hidden {
+    transform: translateX(-100%);
+  }
+
+  .sidebar h3 {
+    margin: 0 0 30px;
+    color: black;
+  }
+
+  .sidebar a {
+    color: white;
+    text-decoration: none;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .main-content {
+    margin-left: 250px;
+    flex: 1;
+    transition: margin-left 0.3s;
+  }
+
+  .main-content.full {
+    margin-left: 0;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1001;
+  }
+
+  .burger {
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  .dashboard-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .search-bar {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .status {
+    font-size: 14px;
+  }
+
+  .status.red {
+    color: red;
+  }
+
+  .weekly-chart {
+    background: #fff;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  th, td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+  }
+
+  th {
+    background: #444;
+    color: white;
+  }
+
+  .delete-btn {
+    background: red;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .logout-button {
+    margin: 20px;
+    text-align: right;
+  }
+
+  .logout-button button {
+    padding: 10px 20px;
+    background: green;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  form input {
+    margin-right: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  form button {
+    padding: 8px 16px;
+    background: #4b7c67;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
   <div class="sidebar" id="sidebar">
