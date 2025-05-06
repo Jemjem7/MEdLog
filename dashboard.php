@@ -358,6 +358,16 @@ $prescriptions = $_SESSION['prescriptions'];
       .then(json => {
         if (json.success) {
           document.querySelector(`tr[data-index="${idx}"]`).remove();
+
+
+        // Update revenue on delete
+        const revenueEl = document.getElementById('revenueDisplay');
+        const currentRevenue = parseFloat(revenueEl.textContent.replace(/[₱,]/g, ''));
+        const newRevenue = currentRevenue - price;
+        revenueEl.textContent = `₱${newRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+
+
         } else {
           alert('Failed to delete');
         }
