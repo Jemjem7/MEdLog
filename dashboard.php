@@ -246,8 +246,12 @@ $prescriptions = $_SESSION['prescriptions'];
 
 
 <!-- Additional KPIs -->
- 
 
+<div class="card">
+    <h3>Total Medicine Inventory</h3>
+    <p style="font-size:24px;">530</p>
+    <p class="status">🧪 Inventory monitored</p>
+  </div>
 
 
     <div class="weekly-chart">
