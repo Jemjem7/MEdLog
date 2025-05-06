@@ -241,10 +241,10 @@ $prescriptions = $_SESSION['prescriptions'];
         <p style="font-size:24px;">₱<?= number_format($revenue,2) ?></p>
         <p class="status">💰 Updated real-time</p>
       </div>
-    </div>
-
-
     
+
+
+
 
     <div class="card">
   <h3>New Patients This Week</h3>
@@ -358,6 +358,49 @@ $prescriptions = $_SESSION['prescriptions'];
       })
       .catch(() => alert('Error deleting'));
     }
+
+
+
+// Real-time add prescription and update card
+document.querySelector('form').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+
+  fetch('', {
+    method: 'POST',
+    body: formData
+  })
+  .then(() => {
+    const table = document.getElementById('prescriptionsTable');
+    const newRow = table.insertRow(1); // After table headers
+
+    const patient = formData.get('patient');
+    const medicine = formData.get('medicine');
+    const dosage = formData.get('dosage');
+    const index = table.rows.length - 2; // Approximate new index
+
+    newRow.setAttribute('data-index', index);
+    newRow.innerHTML = `
+      <td>${patient}</td>
+      <td>${medicine}</td>
+      <td>${dosage}</td>
+      <td><button class="delete-btn" onclick="deletePrescription(${index})">Delete</button></td>
+    `;
+
+    // Update patient count card
+    const countEl = document.getElementById('newPatientsCount');
+    countEl.textContent = parseInt(countEl.textContent) + 1;
+
+    this.reset(); // Clear form
+  })
+  .catch(() => alert("Failed to add prescription"));
+});
+
+
+
+
+
   </script>
 </body>
 </html>
