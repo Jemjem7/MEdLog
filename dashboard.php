@@ -243,6 +243,13 @@ $prescriptions = $_SESSION['prescriptions'];
       </div>
     </div>
 
+
+
+<!-- Additional KPIs -->
+ 
+
+
+
     <div class="weekly-chart">
       <h3>Weekly Appointments</h3>
       <canvas id="weeklyAppointmentsChart" style="width:100%; height:200px;"></canvas>
