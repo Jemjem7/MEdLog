@@ -244,6 +244,14 @@ $prescriptions = $_SESSION['prescriptions'];
     </div>
 
 
+    
+
+    <div class="card">
+  <h3>New Patients This Week</h3>
+  <p id="newPatientsCount" style="font-size:24px;"><?= count($prescriptions) ?></p>
+  <p class="status">🆕 Growing steadily</p>
+</div>
+
 
 <!-- Additional KPIs -->
 
