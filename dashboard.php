@@ -360,11 +360,13 @@ $prescriptions = $_SESSION['prescriptions'];
           document.querySelector(`tr[data-index="${idx}"]`).remove();
 
 
-        // Update revenue on delete
-        const revenueEl = document.getElementById('revenueDisplay');
-        const currentRevenue = parseFloat(revenueEl.textContent.replace(/[₱,]/g, ''));
-        const newRevenue = currentRevenue - price;
-        revenueEl.textContent = `₱${newRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        // Recalculate total revenue based on remaining rows
+let total = 0;
+document.querySelectorAll('#prescriptionsTable tr[data-price]').forEach(row => {
+  total += parseFloat(row.getAttribute('data-price')) || 0;
+});
+revenueEl.textContent = `₱${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 
         // Decrease patient count
         const countEl = document.getElementById('newPatientsCount');
