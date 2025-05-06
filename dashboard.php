@@ -393,6 +393,15 @@ document.querySelector('form').addEventListener('submit', function(e) {
     const countEl = document.getElementById('newPatientsCount');
     countEl.textContent = parseInt(countEl.textContent) + 1;
 
+
+
+    // Update revenue
+    const revenueEl = document.getElementById('revenueDisplay');
+      const currentRevenue = parseFloat(revenueEl.textContent.replace(/[₱,]/g, ''));
+      const newRevenue = currentRevenue + price;
+      revenueEl.textContent = `₱${newRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+
     this.reset(); // Clear form
   })
   .catch(() => alert("Failed to add prescription"));
