@@ -237,10 +237,11 @@ $prescriptions = $_SESSION['prescriptions'];
         <p class="status" style="color:orange;">⚠️ Needs attention</p>
       </div>
       <div class="card">
-        <h3>Revenue</h3>
-        <p style="font-size:24px;">₱<?= number_format($revenue,2) ?></p>
-        <p class="status">💰 Updated real-time</p>
-      </div>
+  <h3>Revenue</h3>
+  <p id="revenueDisplay" style="font-size:24px;">₱<?= number_format($revenue, 2) ?></p>
+  <p class="status">💰 Updated real-time</p>
+</div>
+
     
 
 
