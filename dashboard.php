@@ -356,8 +356,8 @@ $prescriptions = $_SESSION['prescriptions'];
       })
       .then(res => res.json())
       .then(json => {
-        if (json.success) {
-          document.querySelector(`tr[data-index="${idx}"]`).remove();
+         if (json.success) {
+            row.remove();
 
 
         // Recalculate total revenue based on remaining rows
