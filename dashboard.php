@@ -263,7 +263,12 @@ $prescriptions = $_SESSION['prescriptions'];
     <p class="status">🆕 Growing steadily</p>
   </div>
 
-
+  <div class="card">
+    <h3>Supplier Orders This Month</h3>
+    <p style="font-size:24px;">12</p>
+    <p class="status">📦 All received</p>
+  </div>
+</div>
 
 
 
