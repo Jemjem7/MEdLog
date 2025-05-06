@@ -366,7 +366,9 @@ $prescriptions = $_SESSION['prescriptions'];
         const newRevenue = currentRevenue - price;
         revenueEl.textContent = `₱${newRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-
+        // Decrease patient count
+        const countEl = document.getElementById('newPatientsCount');
+        countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
 
         } else {
           alert('Failed to delete');
