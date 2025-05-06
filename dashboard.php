@@ -344,6 +344,11 @@ $prescriptions = $_SESSION['prescriptions'];
 
     // AJAX delete
     function deletePrescription(idx) {
+      const row = document.querySelector(`tr[data-index="${idx}"]`);
+      const price = parseFloat(row.getAttribute('data-price')) || 0;
+
+
+
       fetch('delete_prescription.php', {
         method: 'POST',
         headers: { 'Content-Type':'application/x-www-form-urlencoded' },
