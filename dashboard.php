@@ -257,6 +257,19 @@ $prescriptions = $_SESSION['prescriptions'];
     <p style="font-size:24px;">5</p>
     <p class="status red">❗ Reorder Needed</p>
   </div>
+  <div class="card">
+    <h3>New Patients This Week</h3>
+    <p style="font-size:24px;">47</p>
+    <p class="status">🆕 Growing steadily</p>
+  </div>
+
+
+
+
+
+
+
+
 
     <div class="weekly-chart">
       <h3>Weekly Appointments</h3>
