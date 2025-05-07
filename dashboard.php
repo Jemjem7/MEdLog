@@ -11,16 +11,38 @@ if (!isset($_SESSION['user'])) {
 $user = htmlspecialchars($_SESSION['user']);
 $revenue = 15420.75;
 
-// Initialize prescriptions if not set
+// Set up the database connection
+$servername = "localhost";
+$username = "root";
+$password = ""; // Or your actual password
+$database = "medlog"; // Your actual DB name
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Check if prescriptions are already in the session
 if (!isset($_SESSION['prescriptions'])) {
-    $_SESSION['prescriptions'] = [
-        ["Jhon", "Aspirin", ""],
-        ["Carlo", "Paracetamol", ""],
-        ["Levi", "Amoxicillin", ""],
-        ["Drasa", "Cetirizine", ""],
-        ["Ice", "Metformin", ""],
-        ["Realdujn", "Bisoprolol", ""]
-    ];
+    // Fetch prescriptions from a database (or real-time source)
+    $query = "SELECT patient_name, medicine, dosage FROM prescriptions"; // Adjust query as per your actual table structure
+    $result = mysqli_query($conn, $query);
+
+    $prescriptions = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $prescriptions[] = [$row['patient_name'], $row['medicine'], $row['dosage']];
+    }
+
+    // If no prescriptions are found, set an empty array
+    if (empty($prescriptions)) {
+        $prescriptions = [];
+    }
+
+    // Store the real-time prescriptions in the session
+    $_SESSION['prescriptions'] = $prescriptions;
 }
 
 // Handle add‐prescription form
@@ -30,6 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['patient'], $_POST['me
     $dosage   = htmlspecialchars($_POST['dosage']);
     array_unshift($_SESSION['prescriptions'], [$patient, $medicine, $dosage]);
 }
+
+// query to get today's appointments
+$today = date('Y-m-d');
+$query = "SELECT * FROM appointments WHERE appointment_date = '$today'";
+$result = mysqli_query($conn, $query);
+$appointmentsToday = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+
+
+
+
 
 $prescriptions = $_SESSION['prescriptions'];
 ?>
@@ -220,20 +253,27 @@ $prescriptions = $_SESSION['prescriptions'];
       <input type="text" class="search-bar" placeholder="Search">
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <h3>Total Patients</h3>
-        <p style="font-size:24px;">0</p>
-        <p class="status">🔼 1% from last month</p>
-      </div>
+    <?php
+// Ensure $prescriptions is defined before this
+$patientNames = array_map(fn($pres) => $pres[0], $prescriptions ?? []);
+$totalPatients = count(array_unique($patientNames));
+?>
+
+<div class="grid">
+  <div class="card">
+    <h3>Total Patients</h3>
+    <p style="font-size:24px;"><?= $totalPatients ?></p>
+    <p class="status">🔼 1% from last month</p>
+  </div>
       <div class="card">
         <h3>Today's Appointments</h3>
-        <p style="font-size:24px;">24</p>
-        <p class="status red">🔽 2% from yesterday</p>
+        <p style="font-size:24px;"><?= count($appointmentsToday) ?></p>
+        <p class="status red">🔽 2% from yesterday</p> <!-- Optional: Add dynamic trend logic -->
       </div>
+
       <div class="card">
         <h3>Pending Prescriptions</h3>
-        <p style="font-size:24px;">8</p>
+        <p style="font-size:24px;">0</p>
         <p class="status" style="color:orange;">⚠️ Needs attention</p>
       </div>
       <div class="card">
@@ -258,23 +298,19 @@ $prescriptions = $_SESSION['prescriptions'];
 
 <div class="card">
     <h3>Total Medicine Inventory</h3>
-    <p style="font-size:24px;">530</p>
+    <p style="font-size:24px;">0</p>
     <p class="status">🧪 Inventory monitored</p>
   </div>
   <div class="card">
     <h3>Out of Stock</h3>
-    <p style="font-size:24px;">5</p>
+    <p style="font-size:24px;">0</p>
     <p class="status red">❗ Reorder Needed</p>
   </div>
-  <div class="card">
-    <h3>New Patients This Week</h3>
-    <p style="font-size:24px;">47</p>
-    <p class="status">🆕 Growing steadily</p>
-  </div>
+
 
   <div class="card">
     <h3>Supplier Orders This Month</h3>
-    <p style="font-size:24px;">12</p>
+    <p style="font-size:24px;">0</p>
     <p class="status">📦 All received</p>
   </div>
 </div>
@@ -342,41 +378,39 @@ $prescriptions = $_SESSION['prescriptions'];
       options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{ stepSize:5 }}}}
     });
 
-    // AJAX delete
-    function deletePrescription(idx) {
-      const row = document.querySelector(`tr[data-index="${idx}"]`);
- 
+ // AJAX delete
+function deletePrescription(idx) {
+  const row = document.querySelector(`tr[data-index="${idx}"]`);
 
+  fetch('delete_prescription.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'delete_index=' + encodeURIComponent(idx)
+  })
+  .then(res => res.json())
+  .then(json => {
+    if (json.success) {
+      row.remove(); // Remove the prescription row from the table
 
-      fetch('delete_prescription.php', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/x-www-form-urlencoded' },
-        body: 'delete_index=' + encodeURIComponent(idx)
-      })
-      .then(res => res.json())
-      .then(json => {
-         if (json.success) {
-            row.remove();
+      // Optionally, if you're calculating revenue, update the total revenue
+      let total = 0;
+      document.querySelectorAll('#prescriptionsTable tr[data-price]').forEach(row => {
+        total += parseFloat(row.getAttribute('data-price')) || 0;
+      });
+      
+      const revenueEl = document.getElementById('revenueDisplay'); // Assuming you have a revenue display element
+      revenueEl.textContent = `₱${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-
-        // Recalculate total revenue based on remaining rows
-let total = 0;
-document.querySelectorAll('#prescriptionsTable tr[data-price]').forEach(row => {
-  total += parseFloat(row.getAttribute('data-price')) || 0;
-});
-revenueEl.textContent = `₱${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-
-        // Decrease patient count
-        const countEl = document.getElementById('newPatientsCount');
-        countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1);
-
-        } else {
-          alert('Failed to delete');
-        }
-      })
-      .catch(() => alert('Error deleting'));
+      // Decrease the New Patients count after deleting a prescription
+      const countEl = document.getElementById('newPatientsCount');
+      countEl.textContent = Math.max(0, parseInt(countEl.textContent) - 1); // Decrease patient count
+    } else {
+      alert('Failed to delete');
     }
+  })
+  .catch(() => alert('Error deleting'));
+}
+
 
 
 
@@ -386,18 +420,18 @@ document.querySelector('form').addEventListener('submit', function(e) {
 
   const formData = new FormData(this);
 
-  fetch('', {
+  fetch('', { // Make a POST request to add a new prescription
     method: 'POST',
     body: formData
   })
   .then(() => {
     const table = document.getElementById('prescriptionsTable');
-    const newRow = table.insertRow(1); // After table headers
+    const newRow = table.insertRow(1); // Insert a new row after the header
 
     const patient = formData.get('patient');
     const medicine = formData.get('medicine');
     const dosage = formData.get('dosage');
-    const index = table.rows.length - 2; // Approximate new index
+    const index = table.rows.length - 2; // Approximate new index for the row
 
     newRow.setAttribute('data-index', index);
     newRow.innerHTML = `
@@ -407,20 +441,15 @@ document.querySelector('form').addEventListener('submit', function(e) {
       <td><button class="delete-btn" onclick="deletePrescription(${index})">Delete</button></td>
     `;
 
-    // Update patient count card
+    // Update New Patients Count
     const countEl = document.getElementById('newPatientsCount');
-    countEl.textContent = parseInt(countEl.textContent) + 1;
+    countEl.textContent = parseInt(countEl.textContent) + 1; // Increment the count
 
+    // Optionally, update Total Patients count (if the patient is unique)
+    const totalPatientsCountEl = document.getElementById('totalPatientsCount');
+    totalPatientsCountEl.textContent = parseInt(totalPatientsCountEl.textContent) + 1;
 
-
-    // Update revenue
-    const revenueEl = document.getElementById('revenueDisplay');
-      const currentRevenue = parseFloat(revenueEl.textContent.replace(/[₱,]/g, ''));
-      const newRevenue = currentRevenue + price;
-      revenueEl.textContent = `₱${newRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-
-    this.reset(); // Clear form
+    this.reset(); // Clear form fields after submission
   })
   .catch(() => alert("Failed to add prescription"));
 });
