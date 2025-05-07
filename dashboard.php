@@ -223,14 +223,14 @@ $prescriptions = $_SESSION['prescriptions'];
     <div class="grid">
       <div class="card">
         <h3>Total Patients</h3>
-        <p style="font-size:24px;">1,248</p>
-        <p class="status">🔼 12% from last month</p>
+        <p style="font-size:24px;">0</p>
+        <p class="status">🔼 1% from last month</p>
       </div>
       <div class="card">
-        <h3>Today's Appointments</h3>
-        <p style="font-size:24px;">24</p>
-        <p class="status red">🔽 2% from yesterday</p>
-      </div>
+  <h3>Today's Appointments</h3>
+  <p id="todaysAppointmentsCount" style="font-size:24px;"><?= count($todaysAppointments) ?></p>
+  <p class="status">📅 Updated real-time</p>
+</div>
       <div class="card">
         <h3>Pending Prescriptions</h3>
         <p style="font-size:24px;">8</p>
@@ -345,8 +345,7 @@ $prescriptions = $_SESSION['prescriptions'];
     // AJAX delete
     function deletePrescription(idx) {
       const row = document.querySelector(`tr[data-index="${idx}"]`);
-      const price = parseFloat(row.getAttribute('data-price')) || 0;
-
+ 
 
 
       fetch('delete_prescription.php', {
