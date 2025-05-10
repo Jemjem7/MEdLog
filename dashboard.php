@@ -20,6 +20,22 @@ $database = "medlog"; // Your actual DB name
 // Create connection
 $conn = new mysqli($servername, $username, $password, $database);
 
+
+
+
+$result = $conn->query("SELECT * FROM prescriptions WHERE is_read = 0 ORDER BY created_at DESC LIMIT 1");
+$newPrescription = $result ? $result->fetch_assoc() : null;
+
+
+
+
+
+
+
+
+
+
+
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -28,8 +44,12 @@ if ($conn->connect_error) {
 // Check if prescriptions are already in the session
 if (!isset($_SESSION['prescriptions'])) {
     // Fetch prescriptions from a database (or real-time source)
-    $query = "SELECT patient_name, medicine, dosage FROM prescriptions"; // Adjust query as per your actual table structure
+    $query = "SELECT patient_name, medicine, med_dosage FROM prescriptions";
     $result = mysqli_query($conn, $query);
+    if (!$result) {
+        die("Query failed: " . mysqli_error($conn));
+    }
+    
 
     $prescriptions = [];
     while ($row = mysqli_fetch_assoc($result)) {
@@ -60,12 +80,25 @@ $result = mysqli_query($conn, $query);
 $appointmentsToday = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 
+// Fetch data for the weekly appointments
+$query = "SELECT DAYOFWEEK(appointment_date) AS day_of_week, COUNT(*) AS count FROM appointments WHERE WEEK(appointment_date) = WEEK(CURRENT_DATE) GROUP BY DAYOFWEEK(appointment_date)";
+$result = mysqli_query($conn, $query);
+$appointmentsData = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $appointmentsData[$row['day_of_week']] = $row['count'];
+}
+
+// Set up the chart data labels dynamically
+$daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+$appointmentsCount = array_map(fn($day) => $appointmentsData[$day] ?? 0, range(1, 7)); // Use 0 for missing data
 
 
 
 
 $prescriptions = $_SESSION['prescriptions'];
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,33 +112,45 @@ $prescriptions = $_SESSION['prescriptions'];
     background: #f5f5f5;
     display: flex;
   }
-
   .sidebar {
-    width: 250px;
-    background: #4b7c67;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    padding: 20px;
-    color: white;
-    transition: transform 0.3s;
-  }
+  width: 250px;
+  background: #4b7c67;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  padding: 20px;
+  color: white;
+  transition: transform 0.3s;
+}
 
-  .sidebar.hidden {
-    transform: translateX(-100%);
-  }
+.sidebar.hidden {
+  transform: translateX(-100%);
+}
 
-  .sidebar h3 {
-    margin: 0 0 30px;
-    color: black;
-  }
+.sidebar h3 {
+  margin: 0 0 30px;
+  color: black;
+}
 
-  .sidebar a {
-    color: white;
-    text-decoration: none;
-    margin-bottom: 20px;
-    display: block;
-  }
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  margin-bottom: 20px;
+  display: block;
+  padding: 12px 16px;
+  background-color: #2f5d4d;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: #3e6e5c;
+}
+
+.sidebar a.active {
+  background-color: #1e4d3a;
+  font-weight: bold;
+}
 
   .main-content {
     margin-left: 250px;
@@ -236,15 +281,25 @@ $prescriptions = $_SESSION['prescriptions'];
 </style>
 </head>
 <body>
-  <div class="sidebar" id="sidebar">
-    <h3>NBSC<br>MediSync</h3>
-    <a href="#">Dashboard</a>
-    <a href="#">Medicine Inventory</a>
-    <a href="#">Prescription Management</a>
-    <a href="#">Orders & Supplier</a>
-    <a href="#">Reports & Analytics</a>
-    <a href="#">Settings</a>
-  </div>
+<div class="sidebar" id="sidebar">
+  <h3>MediSync</h3>
+  <a href="dashboard.php" class="sidebar-btn">Dashboard</a>
+  <a href="inventory.php" class="sidebar-btn">Medicine Inventory</a>
+  <a href="prescription_management.php" class="sidebar-btn">Prescription Management</a>
+  <a href="orders.php" class="sidebar-btn">Orders & Supplier</a>
+  <a href="reports.php" class="sidebar-btn">Reports & Analytics</a>
+  <a href="settings.php" class="sidebar-btn">Settings</a>
+</div>
+
+
+<?php if ($newPrescription): ?>
+<script>
+    alert("📨 New prescription for <?= htmlspecialchars($newPrescription['patient_name']) ?>. Please process it.");
+    // Optional: You can redirect to a processing page
+    // window.location.href = "process_prescription.php?id=<?= $newPrescription['id'] ?>";
+</script>
+<?php endif; ?>
+
 
   <div class="main-content" id="main">
     <div class="header">
@@ -456,6 +511,11 @@ document.querySelector('form').addEventListener('submit', function(e) {
 
 
 
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("hidden");
+        }
+    
 
 
   </script>
