@@ -255,7 +255,8 @@ $prescriptions = $_SESSION['prescriptions'];
           <span class="notification-badge">3</span>
         </button>
         <div class="flex items-center">
-          <img src="https://via.placeholder.com/40" alt="User" class="w-8 h-8 rounded-full mr-2">
+                    <img src="image.png" alt="User" class="w-8 h-8 rounded-full mr-2">
+
           <span class="font-medium">Admin</span>
         </div>
       </div>

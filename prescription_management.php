@@ -121,7 +121,8 @@ if (!isset($_SESSION['user'])) {
           <span class="notification-badge">3</span>
         </button>
         <div class="flex items-center">
-          <img src="https://via.placeholder.com/40" alt="User" class="w-8 h-8 rounded-full mr-2">
+          <img src="image.png" alt="User" class="w-8 h-8 rounded-full mr-2">
+
           <span class="font-medium">Admin</span>
         </div>
       </div>
@@ -229,154 +230,141 @@ if (!isset($_SESSION['user'])) {
   </div>
 
   <!-- Add/Edit Prescription Modal -->
-  <div id="prescriptionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
-      <div class="p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-bold" id="modalTitle">Add New Prescription</h3>
-          <button onclick="hidePrescriptionModal()" class="text-gray-500 hover:text-gray-700">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <form id="prescriptionForm">
-          <input type="hidden" id="prescriptionId">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block text-gray-700 text-sm font-bold mb-2" for="patientName">
-                Patient Name <span class="text-red-500">*</span>
-              </label>
-              <input type="text" id="patientName" name="patientName" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            </div>
-            <div>
-              <label class="block text-gray-700 text-sm font-bold mb-2" for="doctorName">
-                Doctor Name <span class="text-red-500">*</span>
-              </label>
-              <input type="text" id="doctorName" name="doctorName" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            </div>
-          </div>
-          
-          <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="diagnosis">
-              Diagnosis
-            </label>
-            <textarea id="diagnosis" name="diagnosis" rows="2"
-              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
-          </div>
-          
-          <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2">
-              Medicines <span class="text-red-500">*</span>
-            </label>
-            <div id="medicinesContainer">
-              <!-- Medicine rows will be added here -->
-            </div>
-            <button type="button" onclick="addMedicineRow()" class="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-800 py-1 px-3 rounded text-sm">
-              <i class="fas fa-plus mr-1"></i> Add Medicine
-            </button>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label class="block text-gray-700 text-sm font-bold mb-2" for="prescriptionDate">
-                Date <span class="text-red-500">*</span>
-              </label>
-              <input type="date" id="prescriptionDate" name="prescriptionDate" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-            </div>
-            <div>
-              <label class="block text-gray-700 text-sm font-bold mb-2" for="status">
-                Status <span class="text-red-500">*</span>
-              </label>
-              <select id="status" name="status" required
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="flex justify-end">
-            <button type="button" onclick="hidePrescriptionModal()" class="mr-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-              Cancel
-            </button>
-            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-              Save Prescription
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
- <!-- View Prescription Modal -->
-<div id="viewPrescriptionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+<div id="prescriptionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
   <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
     <div class="p-6">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold">Prescription Details</h3>
-        <button onclick="hideViewPrescriptionModal()" class="text-gray-500 hover:text-gray-700">
+        <h3 class="text-lg font-bold" id="modalTitle">Add New Prescription</h3>
+        <button onclick="hidePrescriptionModal()" class="text-gray-500 hover:text-gray-700">
           <i class="fas fa-times"></i>
         </button>
       </div>
-
-      <div class="mb-6">
+      <form id="prescriptionForm">
+        <input type="hidden" id="prescriptionId">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <p class="text-gray-500 text-sm">Prescription ID</p>
-            <p class="font-medium" id="viewPrescriptionId"><!-- Dynamic ID --></p>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="patientName">Patient Name <span class="text-red-500">*</span></label>
+            <input type="text" id="patientName" name="patientName" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
           </div>
           <div>
-            <p class="text-gray-500 text-sm">Date</p>
-            <p class="font-medium" id="viewDate"><!-- Dynamic Date --></p>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="doctorName">Doctor Name <span class="text-red-500">*</span></label>
+            <input type="text" id="doctorName" name="doctorName" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
           </div>
         </div>
-
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="diagnosis">Diagnosis</label>
+          <textarea id="diagnosis" name="diagnosis" rows="2" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">Medicines <span class="text-red-500">*</span></label>
+          <div id="medicinesContainer"></div>
+          <button type="button" onclick="addMedicineRow()" class="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-800 py-1 px-3 rounded text-sm">
+            <i class="fas fa-plus mr-1"></i> Add Medicine
+          </button>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <p class="text-gray-500 text-sm">Patient Name</p>
-            <p class="font-medium" id="viewPatientName"><!-- Dynamic Patient Name --></p>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="prescriptionDate">Date <span class="text-red-500">*</span></label>
+            <input type="date" id="prescriptionDate" name="prescriptionDate" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
           </div>
           <div>
-            <p class="text-gray-500 text-sm">Doctor Name</p>
-            <p class="font-medium" id="viewDoctorName"><!-- Dynamic Doctor Name --></p>
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="status">Status <span class="text-red-500">*</span></label>
+            <select id="status" name="status" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="completed">Completed</option>
+            </select>
           </div>
         </div>
-
-        <div class="mb-4">
-          <p class="text-gray-500 text-sm">Diagnosis</p>
-          <p class="font-medium" id="viewDiagnosis"><!-- Dynamic Diagnosis --></p>
+        <div class="flex justify-end">
+          <button type="button" onclick="hidePrescriptionModal()" class="mr-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Cancel</button>
+          <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Save Prescription</button>
         </div>
-
-        <div class="mb-4">
-          <p class="text-gray-500 text-sm mb-2">Medicines</p>
-          <div class="border rounded-lg overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Medicine</th>
-                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dosage</th>
-                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200" id="viewMedicinesTable">
-                <!-- Medicines will be dynamically added here -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      </form>
     </div>
   </div>
 </div>
 
+
+ <!-- View Prescription Modal -->
+  <div id="viewPrescriptionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold">Prescription Details</h3>
+          <button onclick="hideViewPrescriptionModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
         
+        <div class="mb-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <p class="text-gray-500 text-sm">Prescription ID</p>
+              <p class="font-medium" id="viewPrescriptionId">PR-2023-001</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm">Date</p>
+              <p class="font-medium" id="viewDate">June 15, 2023</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <p class="text-gray-500 text-sm">Patient Name</p>
+              <p class="font-medium" id="viewPatientName">John Doe</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm">Doctor Name</p>
+              <p class="font-medium" id="viewDoctorName">Dr. Smith</p>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <p class="text-gray-500 text-sm">Diagnosis</p>
+            <p class="font-medium" id="viewDiagnosis">Upper respiratory infection</p>
+          </div>
+          
+          <div class="mb-4">
+            <p class="text-gray-500 text-sm mb-2">Medicines</p>
+            <div class="border rounded-lg overflow-hidden">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Medicine</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dosage</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200" id="viewMedicinesTable">
+                  <!-- Medicines will be added here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div>
+            <p class="text-gray-500 text-sm">Status</p>
+            <p>
+              <span class="status-badge status-pending" id="viewStatus">Pending</span>
+            </p>
+          </div>
+        </div>
+        
+        <div class="flex justify-end">
+          <button onclick="hideViewPrescriptionModal()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Sample prescription data
-    // Removed duplicate declaration of prescriptions
+    let prescriptions = [
+     
+    ];
 
     // Toggle sidebar
     function toggleSidebar() {
@@ -672,213 +660,6 @@ if (!isset($_SESSION['user'])) {
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('prescriptionDate').value = today;
     });
-
-//////////////////////////////////////////////////////////////////////////////////////
-// Global prescriptions array (load from localStorage if exists)
-let prescriptions = JSON.parse(localStorage.getItem('prescriptions')) || [];
-let prescriptionIdCounter = prescriptions.length ? Math.max(...prescriptions.map(p => parseInt(p.id.split('-')[1]))) + 1 : 1;
-
-// Utility: Generate unique prescription ID
-function generatePrescriptionId() {
-  return `PR-${new Date().getFullYear()}-${String(prescriptionIdCounter++).padStart(3, '0')}`;
-}
-
-// Utility: Clear form
-function clearPrescriptionForm() {
-  document.getElementById("prescriptionForm").reset();
-  document.getElementById("medicinesContainer").innerHTML = "";
-  document.getElementById("prescriptionId").value = "";
-}
-
-// Add medicine row dynamically
-function addMedicineRow() {
-  const container = document.getElementById("medicinesContainer");
-  const div = document.createElement("div");
-  div.className = "medicine-row flex gap-2 mb-2";
-  div.innerHTML = `
-    <input type="text" placeholder="Medicine" class="medicine-name border p-1 rounded w-1/3" required>
-    <input type="text" placeholder="Dosage" class="medicine-dosage border p-1 rounded w-1/3" required>
-    <input type="text" placeholder="Duration" class="medicine-duration border p-1 rounded w-1/3" required>
-    <button type="button" onclick="this.parentElement.remove()" class="text-red-600 hover:text-red-800">&times;</button>
-  `;
-  container.appendChild(div);
-}
-
-// CRUD: Create or Update
-document.getElementById('prescriptionForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-
-  const idField = document.getElementById('prescriptionId').value;
-  const patientName = document.getElementById("patientName").value.trim();
-  const doctorName = document.getElementById("doctorName").value.trim();
-  const diagnosis = document.getElementById("diagnosis").value.trim();
-  const date = document.getElementById("prescriptionDate").value;
-  const status = document.getElementById("status").value;
-
-  // Collect medicines
-  const medicines = [];
-  document.querySelectorAll('.medicine-row').forEach(row => {
-    const name = row.querySelector('.medicine-name').value.trim();
-    const dosage = row.querySelector('.medicine-dosage').value.trim();
-    const duration = row.querySelector('.medicine-duration').value.trim();
-
-    if (name && dosage && duration) {
-      medicines.push({ name, dosage, duration });
-    }
-  });
-
-  if (medicines.length === 0) {
-    alert('Please add at least one medicine.');
-    return;
-  }
-
-  // Create prescription object
-  const prescription = {
-    id: idField || generatePrescriptionId(),
-    patientName,
-    doctorName,
-    diagnosis,
-    date,
-    status,
-    medicines
-  };
-
-  // Check if it's an update or create
-  const existingIndex = prescriptions.findIndex(p => p.id === prescription.id);
-  if (existingIndex >= 0) {
-    prescriptions[existingIndex] = prescription;
-  } else {
-    prescriptions.unshift(prescription);
-  }
-
-  // Save to local storage
-  localStorage.setItem('prescriptions', JSON.stringify(prescriptions));
-
-  // Refresh table
-  renderPrescriptionsTable();
-
-  // Reset form
-  clearPrescriptionForm();
-  hidePrescriptionModal();
-});
-
-// Render Table
-function renderPrescriptionsTable() {
-  const table = document.getElementById('prescriptionsTable');
-  table.innerHTML = '';
-
-  prescriptions.forEach(prescription => {
-    const row = document.createElement('tr');
-    row.className = 'hover:bg-gray-50';
-
-    const formattedDate = new Date(prescription.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-    const medicinesList = prescription.medicines.map(m => `${m.name} (${m.dosage})`).join(', ');
-
-    row.innerHTML = `
-      <td class="px-4 py-2">${prescription.id}</td>
-      <td class="px-4 py-2">${prescription.patientName}</td>
-      <td class="px-4 py-2">${prescription.doctorName}</td>
-      <td class="px-4 py-2">${medicinesList}</td>
-      <td class="px-4 py-2">${formattedDate}</td>
-      <td class="px-4 py-2">${prescription.status}</td>
-      <td class="px-4 py-2">
-        <button onclick="viewPrescription('${prescription.id}')" class="text-blue-600 hover:text-blue-900 mr-2"><i class="fas fa-eye"></i></button>
-        <button onclick="editPrescription('${prescription.id}')" class="text-yellow-600 hover:text-yellow-900 mr-2"><i class="fas fa-edit"></i></button>
-        <button onclick="deletePrescription('${prescription.id}')" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
-      </td>
-    `;
-    table.appendChild(row);
-  });
-}
-
-// View
-function viewPrescription(id) {
-  const p = prescriptions.find(p => p.id === id);
-  if (!p) return;
-
-  document.getElementById("viewPrescriptionId").textContent = p.id;
-  document.getElementById("viewPatientName").textContent = p.patientName;
-  document.getElementById("viewDoctorName").textContent = p.doctorName;
-  document.getElementById("viewDiagnosis").textContent = p.diagnosis || "N/A";
-  document.getElementById("viewDate").textContent = new Date(p.date).toLocaleDateString();
-
-  const medicinesTable = document.getElementById("viewMedicinesTable");
-  medicinesTable.innerHTML = "";
-  p.medicines.forEach(med => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td class="px-4 py-2">${med.name}</td><td class="px-4 py-2">${med.dosage}</td><td class="px-4 py-2">${med.duration}</td>`;
-    medicinesTable.appendChild(tr);
-  });
-
-  document.getElementById("viewPrescriptionModal").classList.remove("hidden");
-}
-
-// Edit
-function editPrescription(id) {
-  const p = prescriptions.find(p => p.id === id);
-  if (!p) return;
-
-  document.getElementById('prescriptionId').value = p.id;
-  document.getElementById('patientName').value = p.patientName;
-  document.getElementById('doctorName').value = p.doctorName;
-  document.getElementById('diagnosis').value = p.diagnosis;
-  document.getElementById('prescriptionDate').value = p.date;
-  document.getElementById('status').value = p.status;
-
-  // Populate medicines
-  const container = document.getElementById('medicinesContainer');
-  container.innerHTML = "";
-  p.medicines.forEach(med => {
-    const div = document.createElement("div");
-    div.className = "medicine-row flex gap-2 mb-2";
-    div.innerHTML = `
-      <input type="text" value="${med.name}" class="medicine-name border p-1 rounded w-1/3" required>
-      <input type="text" value="${med.dosage}" class="medicine-dosage border p-1 rounded w-1/3" required>
-      <input type="text" value="${med.duration}" class="medicine-duration border p-1 rounded w-1/3" required>
-      <button type="button" onclick="this.parentElement.remove()" class="text-red-600 hover:text-red-800">&times;</button>
-    `;
-    container.appendChild(div);
-  });
-
-  document.getElementById('prescriptionModal').classList.remove('hidden');
-}
-
-// Delete
-function deletePrescription(id) {
-  if (confirm('Are you sure you want to delete this prescription?')) {
-    const index = prescriptions.findIndex(p => p.id === id);
-    if (index >= 0) {
-      prescriptions.splice(index, 1);
-      // Update localStorage after deleting
-      localStorage.setItem('prescriptions', JSON.stringify(prescriptions));
-      renderPrescriptionsTable(); // Re-render the table
-    }
-  }
-}
-
-// Modals
-function hidePrescriptionModal() {
-  document.getElementById('prescriptionModal').classList.add('hidden');
-  clearPrescriptionForm();
-}
-
-function hideViewPrescriptionModal() {
-  document.getElementById("viewPrescriptionModal").classList.add("hidden");
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('prescriptionDate').value = today;
-  renderPrescriptionsTable(); // Make sure to render prescriptions on page load
-});
-
-
-////////////////////////////////////////////////////////////////////////////////
-
-
-
-
   </script>
 </body>
 </html>

@@ -14,3 +14,19 @@ try {
     echo "Connection failed: " . $e->getMessage();
 }
 ?>
+
+
+<?php
+$host = "localhost";  // change if using a different host
+$username = "root";   // your MySQL username
+$password = "";       // your MySQL password
+$dbname = "prescriptions_db";  // database name
+
+// Create connection
+$conn = new mysqli($host, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
