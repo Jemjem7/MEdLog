@@ -75,3 +75,33 @@ CREATE TABLE IF NOT EXISTS medicines (
     expiry_date DATE NOT NULL,
     category VARCHAR(100) NOT NULL
 );
+
+
+
+
+
+
+
+
+
+---orders & supplier---
+
+CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    supplier VARCHAR(255) NOT NULL,
+    medicine VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    order_date DATE NOT NULL,
+    expected_delivery DATE NOT NULL,
+    status ENUM('pending', 'processing', 'delivered', 'cancelled') DEFAULT 'pending'
+);
+
+
+
+
+CREATE TABLE suppliers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    contact VARCHAR(100),
+    address TEXT
+);
