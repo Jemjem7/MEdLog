@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: #fdf8e5;
+            background: #fff;
             display: flex;
             justify-content: center;
             align-items: center; 
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             align-items: center;
             width: 100%;
             max-width: 1000px;
-            background: #fff;
+            background: #fdf8e5;
             border-radius: 20px;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
             padding: 20px;

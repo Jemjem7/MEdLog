@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #fdf8e5;
+            background: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         .register-container {
-            background: #fff;
+            background: #fdf8e5;
             width: 100%;
             max-width: 1000px;
             border-radius: 20px;
