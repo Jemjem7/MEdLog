@@ -156,7 +156,7 @@
     ?>
 
     <!-- Sidebar -->
-    <div class="sidebar fixed top-0 left-0 h-screen w-64 bg-green-800 text-white p-4 shadow-lg z-50">
+    <div id="sidebar" class="fixed top-0 left-0 h-screen w-64 bg-green-800 text-white p-4 shadow-lg z-50 hidden transition-transform duration-300 -translate-x-64 md:translate-x-0">
         <div class="flex items-center mb-8">
             <i class="fas fa-heartbeat text-2xl mr-2"></i>
             <h3 class="text-xl font-bold">MediSync</h3>
@@ -189,9 +189,14 @@
     </div>
 
     <!-- Main Content -->
-    <div class="ml-64 p-8">
+    <div class="transition-all duration-300 md:ml-64 p-8" id="main-content">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Orders & Supplier Management</h1>
+            <div class="flex items-center">
+                <button id="burger-menu" class="mr-4 text-gray-600 hover:text-gray-900 focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+                <h1 class="text-2xl font-bold text-gray-800">Orders & Supplier Management</h1>
+            </div>
             <div class="flex space-x-4">
                 <button onclick="showAddSupplierModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
                     <i class="fas fa-plus mr-2"></i> New Supplier
@@ -614,6 +619,45 @@
                 form.submit();
             }
         }
+
+        // Burger menu toggle for sidebar with transition and main content margin adjustment
+        document.getElementById('burger-menu').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const isHidden = sidebar.classList.contains('hidden');
+            if (isHidden) {
+                sidebar.classList.remove('hidden');
+                setTimeout(() => {
+                    sidebar.classList.remove('-translate-x-64');
+                    sidebar.classList.add('md:translate-x-0');
+                }, 10);
+                mainContent.classList.add('md:ml-64');
+            } else {
+                sidebar.classList.add('-translate-x-64');
+                sidebar.classList.remove('md:translate-x-0');
+                setTimeout(() => {
+                    sidebar.classList.add('hidden');
+                }, 300);
+                mainContent.classList.remove('md:ml-64');
+            }
+        });
+
+        // On window resize, always show sidebar on desktop
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.remove('-translate-x-64');
+                sidebar.classList.add('md:translate-x-0');
+                mainContent.classList.add('md:ml-64');
+            } else {
+                sidebar.classList.add('-translate-x-64');
+                sidebar.classList.remove('md:translate-x-0');
+                sidebar.classList.add('hidden');
+                mainContent.classList.remove('md:ml-64');
+            }
+        });
     </script>
 </body>
 </html> 
