@@ -91,7 +91,7 @@
     ?>
 
     <!-- Sidebar -->
-    <div class="sidebar fixed top-0 left-0 h-screen w-64 bg-green-800 text-white p-4 shadow-lg z-50">
+    <div id="sidebar" class="fixed top-0 left-0 h-screen w-64 bg-green-800 text-white p-4 shadow-lg z-50 hidden transition-transform duration-300 -translate-x-64 md:translate-x-0">
         <div class="flex items-center mb-8">
             <i class="fas fa-heartbeat text-2xl mr-2"></i>
             <h3 class="text-xl font-bold">MediSync</h3>
