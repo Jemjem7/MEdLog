@@ -56,6 +56,39 @@ function getInventoryStatus($conn) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Fetch medicine details for editing
+if (isset($_GET['edit'])) {
+    $id = $_GET['edit'];
+    $stmt = $conn->prepare("SELECT * FROM medicines WHERE id = :id");
+    $stmt->execute([':id' => $id]);
+    $medicine = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Handle edit form submission
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['edit_medicine'])) {
+    $id = $_POST['id'];
+    $name = $_POST['name'];
+    $quantity = $_POST['quantity'];
+    $minimum_stock = $_POST['minimum_stock'];
+    $expiry_date = $_POST['expiry_date'];
+    $category = $_POST['category'];
+
+    $sql = "UPDATE medicines SET name = :name, quantity = :quantity, minimum_stock = :minimum_stock, expiry_date = :expiry_date, category = :category WHERE id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([
+        ':id' => $id,
+        ':name' => $name,
+        ':quantity' => $quantity,
+        ':minimum_stock' => $minimum_stock,
+        ':expiry_date' => $expiry_date,
+        ':category' => $category
+    ]);
+    header('Location: inventory.php'); // Redirect to inventory after update
+    exit();
+}
+
+
+
 // Handle medicine addition
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_medicine'])) {
     $name = $_POST['name'];
