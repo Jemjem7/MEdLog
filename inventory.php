@@ -1,322 +1,348 @@
+<?php
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "medlog_db";
 
-<?php include 'sidebar.php'; ?>
+try {
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
 
+// Handle form submissions
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['action'])) {
+        switch ($_POST['action']) {
+            case 'add':
+                $name = $_POST['name'];
+                $description = $_POST['description'];
+                $quantity = (int)$_POST['quantity'];
+                $price = (float)$_POST['price'];
+                $expiry_date = $_POST['expiry_date'];
+                
+                $stmt = $conn->prepare("INSERT INTO medicines (name, description, quantity, price, expiry_date) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$name, $description, $quantity, $price, $expiry_date]);
+                break;
+                
+            case 'edit':
+                $id = (int)$_POST['id'];
+                $name = $_POST['name'];
+                $description = $_POST['description'];
+                $quantity = (int)$_POST['quantity'];
+                $price = (float)$_POST['price'];
+                $expiry_date = $_POST['expiry_date'];
+                
+                $stmt = $conn->prepare("UPDATE medicines SET name = ?, description = ?, quantity = ?, price = ?, expiry_date = ? WHERE id = ?");
+                $stmt->execute([$name, $description, $quantity, $price, $expiry_date, $id]);
+                break;
+                
+            case 'delete':
+                $id = (int)$_POST['id'];
+                $stmt = $conn->prepare("DELETE FROM medicines WHERE id = ?");
+                $stmt->execute([$id]);
+                break;
+        }
+    }
+}
+
+// Get all medicines
+$stmt = $conn->query("SELECT * FROM medicines ORDER BY name");
+$medicines = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-
-
-
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medicine Inventory Management</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Medicine Inventory - MediSync</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-  .sidebar {
-    transition: all 0.3s ease;
-  }
-  .notification-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background-color: #ef4444;
-    color: white;
-    font-size: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .notification-panel {
-    transition: all 0.3s ease;
-    transform: translateX(100%);
-  }
-  .notification-panel.open {
-    transform: translateX(0);
-  }
-  .prescription-notification {
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-  }
-</style>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-<?php
-// Database configuration
-$host = "localhost";
-$db = "medlog_db";
-$user = "root";
-$pass = "";
-
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
-
-// Fetch all medicines with computed status
-function getInventoryStatus($conn) {
-    $sql = "SELECT *, 
-                CASE 
-                    WHEN quantity <= minimum_stock THEN 'shortage'
-                    WHEN DATEDIFF(expiry_date, CURDATE()) <= 30 THEN 'expiring'
-                    ELSE 'normal'
-                END as status
-            FROM medicines";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Fetch single medicine for editing
-$edit_medicine = null;
-if (isset($_GET['edit_id'])) {
-    $edit_id = $_GET['edit_id'];
-    $sql = "SELECT * FROM medicines WHERE id = :id";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([':id' => $edit_id]);
-    $edit_medicine = $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-// Handle medicine addition
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['add_medicine'])) {
-    $name = $_POST['name'];
-    $quantity = $_POST['quantity'];
-    $minimum_stock = $_POST['minimum_stock'];
-    $expiry_date = $_POST['expiry_date'];
-    $category = $_POST['category'];
-
-    $sql = "INSERT INTO medicines (name, quantity, minimum_stock, expiry_date, category) 
-            VALUES (:name, :quantity, :minimum_stock, :expiry_date, :category)";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([
-        ':name' => $name,
-        ':quantity' => $quantity,
-        ':minimum_stock' => $minimum_stock,
-        ':expiry_date' => $expiry_date,
-        ':category' => $category
-    ]);
-}
-
-// Handle medicine update
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['edit_medicine'])) {
-    $id = $_POST['id'];
-    $name = $_POST['name'];
-    $quantity = $_POST['quantity'];
-    $minimum_stock = $_POST['minimum_stock'];
-    $expiry_date = $_POST['expiry_date'];
-    $category = $_POST['category'];
-
-    $sql = "UPDATE medicines 
-            SET name = :name, quantity = :quantity, minimum_stock = :minimum_stock, expiry_date = :expiry_date, category = :category 
-            WHERE id = :id";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([
-        ':id' => $id,
-        ':name' => $name,
-        ':quantity' => $quantity,
-        ':minimum_stock' => $minimum_stock,
-        ':expiry_date' => $expiry_date,
-        ':category' => $category
-    ]);
-
-    header("Location: " . $_SERVER['PHP_SELF']); // Refresh after update
-    exit();
-}
-
-// Handle deletion
-if (isset($_GET['delete_id'])) {
-    $delete_id = $_GET['delete_id'];
-    $sql = "DELETE FROM medicines WHERE id = :id";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute([':id' => $delete_id]);
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit();
-}
-
-// Load inventory
-$inventory = getInventoryStatus($conn);
-?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="container-fluid py-4">
-    <h2 class="mb-4">Medicine Inventory Management</h2>
-
-    <!-- Summary Cards -->
-    <div class="row mb-4">
-        <?php
-        $total = count($inventory);
-        $shortage = count(array_filter($inventory, fn($m) => $m['status'] === 'shortage'));
-        $expiring = count(array_filter($inventory, fn($m) => $m['status'] === 'expiring'));
-        ?>
-        <div class="col-md-4">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h5>Total Medicines</h5>
-                    <h2><?= $total ?></h2>
-                </div>
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-green-800 text-white transition-transform duration-300 transform -translate-x-full md:translate-x-0 z-40">
+        <div class="p-4">
+            <div class="flex items-center justify-center mb-8">
+                <i class="fas fa-heartbeat text-3xl mr-2"></i>
+                <h1 class="text-xl font-bold">MediSync</h1>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <h5>Low Stock Items</h5>
-                    <h2><?= $shortage ?></h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-danger text-white">
-                <div class="card-body">
-                    <h5>Expiring Soon</h5>
-                    <h2><?= $expiring ?></h2>
-                </div>
-            </div>
+            <nav>
+                <a href="dashboard.php" class="block py-2 px-4 rounded hover:bg-green-700 mb-2">
+                    <i class="fas fa-chart-line mr-2"></i> Dashboard
+                </a>
+                <a href="inventory.php" class="block py-2 px-4 rounded bg-green-700 mb-2">
+                    <i class="fas fa-pills mr-2"></i> Inventory
+                </a>
+                <a href="orders.php" class="block py-2 px-4 rounded hover:bg-green-700 mb-2">
+                    <i class="fas fa-shopping-cart mr-2"></i> Orders
+                </a>
+                <a href="settings.php" class="block py-2 px-4 rounded hover:bg-green-700 mb-2">
+                    <i class="fas fa-cog mr-2"></i> Settings
+                </a>
+            </nav>
         </div>
     </div>
 
-    <!-- Add or Edit Medicine Form -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="mb-0"><?= $edit_medicine ? "Edit Medicine" : "Add New Medicine" ?></h5>
-    </div>
-    <div class="card-body">
-        <form method="POST" class="row g-3">
-            <?php if ($edit_medicine): ?>
-                <input type="hidden" name="id" value="<?= $edit_medicine['id'] ?>">
-            <?php endif; ?>
-            <div class="col-md-3">
-                <input type="text" class="form-control" name="name" placeholder="Medicine Name" value="<?= $edit_medicine['name'] ?? '' ?>" required>
+    <!-- Main Content -->
+    <div class="md:ml-64 min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm p-4 flex justify-between items-center sticky top-0 z-30">
+            <div class="flex items-center">
+                <button onclick="toggleSidebar()" class="mr-4 text-gray-600 hover:text-gray-900 md:hidden">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <h1 class="text-xl font-bold text-gray-800">Medicine Inventory</h1>
             </div>
-            <div class="col-md-2">
-                <input type="number" class="form-control" name="quantity" placeholder="Quantity" value="<?= $edit_medicine['quantity'] ?? '' ?>" required>
+        </header>
+
+        <!-- Content -->
+        <main class="p-6">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600">
+                            <i class="fas fa-pills text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-gray-600 text-sm">Total Medicines</h2>
+                            <p class="text-2xl font-semibold text-gray-800"><?php echo count($medicines); ?></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                            <i class="fas fa-exclamation-triangle text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-gray-600 text-sm">Low Stock Items</h2>
+                            <p class="text-2xl font-semibold text-gray-800">
+                                <?php echo count(array_filter($medicines, function($m) { return $m['quantity'] < 10; })); ?>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-100 text-red-600">
+                            <i class="fas fa-clock text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-gray-600 text-sm">Expiring Soon</h2>
+                            <p class="text-2xl font-semibold text-gray-800">
+                                <?php 
+                                $expiring_soon = array_filter($medicines, function($m) {
+                                    return strtotime($m['expiry_date']) - time() < 30 * 24 * 60 * 60; // 30 days
+                                });
+                                echo count($expiring_soon);
+                                ?>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <input type="number" class="form-control" name="minimum_stock" placeholder="Minimum Stock" value="<?= $edit_medicine['minimum_stock'] ?? '' ?>" required>
-            </div>
-            <div class="col-md-2">
-                <input type="date" class="form-control" name="expiry_date" value="<?= $edit_medicine['expiry_date'] ?? '' ?>" required>
-            </div>
-            <div class="col-md-2">
-                <select class="form-select" name="category" required>
-                    <option value="">Select Category</option>
-                    <?php
-                    $categories = ['Tablet', 'Capsule', 'Syrup', 'Injection', 'Cream'];
-                    foreach ($categories as $cat) {
-                        $selected = isset($edit_medicine['category']) && $edit_medicine['category'] === $cat ? 'selected' : '';
-                        echo "<option value=\"$cat\" $selected>$cat</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class="col-md-1">
-                <button type="submit" name="<?= $edit_medicine ? 'edit_medicine' : 'add_medicine' ?>" class="btn btn-<?= $edit_medicine ? 'warning' : 'primary' ?> w-100">
-                    <?= $edit_medicine ? 'Update' : 'Add' ?>
+
+            <!-- Add Medicine Button -->
+            <div class="mb-6">
+                <button onclick="showAddModal()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                    <i class="fas fa-plus mr-2"></i> Add New Medicine
                 </button>
             </div>
-        </form>
-    </div>
-</div>
 
-
-    <!-- Inventory Table -->
-    <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">Medicine Inventory</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead>
+            <!-- Medicine List -->
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th>Medicine Name</th>
-                            <th>Category</th>
-                            <th>Quantity</th>
-                            <th>Min Stock</th>
-                            <th>Expiry Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php foreach ($inventory as $item): ?>
-                        <tr class="<?= $item['status'] === 'shortage' ? 'alert-shortage' : ($item['status'] === 'expiring' ? 'alert-expiring' : '') ?>">
-                            <td><?= htmlspecialchars($item['name']) ?></td>
-                            <td><?= htmlspecialchars($item['category']) ?></td>
-                            <td><?= $item['quantity'] ?></td>
-                            <td><?= $item['minimum_stock'] ?></td>
-                            <td><?= htmlspecialchars($item['expiry_date']) ?></td>
-                            <td>
-                                <?php if ($item['status'] === 'shortage'): ?>
-                                    <span class="badge bg-danger">Low Stock</span>
-                                <?php elseif ($item['status'] === 'expiring'): ?>
-                                    <span class="badge bg-warning text-dark">Expiring Soon</span>
-                                <?php else: ?>
-                                    <span class="badge bg-success">Normal</span>
-                                <?php endif; ?>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <?php foreach ($medicines as $medicine): ?>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($medicine['name']); ?></div>
                             </td>
-                            <td>
-                                <a href="?edit_id=<?= $item['id'] ?>" class="btn btn-sm btn-primary">
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-500"><?php echo htmlspecialchars($medicine['description']); ?></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900"><?php echo $medicine['quantity']; ?></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">$<?php echo number_format($medicine['price'], 2); ?></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900"><?php echo date('M d, Y', strtotime($medicine['expiry_date'])); ?></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <?php
+                                $status_class = 'bg-green-100 text-green-800';
+                                $status_text = 'Normal';
+                                
+                                if ($medicine['quantity'] < 10) {
+                                    $status_class = 'bg-yellow-100 text-yellow-800';
+                                    $status_text = 'Low Stock';
+                                }
+                                
+                                if (strtotime($medicine['expiry_date']) - time() < 30 * 24 * 60 * 60) {
+                                    $status_class = 'bg-red-100 text-red-800';
+                                    $status_text = 'Expiring Soon';
+                                }
+                                ?>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $status_class; ?>">
+                                    <?php echo $status_text; ?>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="showEditModal(<?php echo htmlspecialchars(json_encode($medicine)); ?>)" class="text-green-600 hover:text-green-900 mr-3">
                                     <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="?delete_id=<?= $item['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this item?')">
+                                </button>
+                                <button onclick="confirmDelete(<?php echo $medicine['id']; ?>)" class="text-red-600 hover:text-red-900">
                                     <i class="fas fa-trash"></i>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                         <?php endforeach; ?>
-                        <?php if (empty($inventory)): ?>
-                        <tr><td colspan="7" class="text-center text-muted">No medicines found.</td></tr>
-                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="medicineModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Add New Medicine</h3>
+                <form id="medicineForm" method="POST" class="mt-4">
+                    <input type="hidden" name="action" id="formAction" value="add">
+                    <input type="hidden" name="id" id="medicineId">
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Name</label>
+                        <input type="text" name="name" id="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">Description</label>
+                        <textarea name="description" id="description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="quantity">Quantity</label>
+                        <input type="number" name="quantity" id="quantity" required min="0" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="price">Price</label>
+                        <input type="number" name="price" id="price" required min="0" step="0.01" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="expiry_date">Expiry Date</label>
+                        <input type="date" name="expiry_date" id="expiry_date" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <button type="submit" class="bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Save
+                        </button>
+                        <button type="button" onclick="hideModal()" class="bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <h3 class="text-lg font-medium text-gray-900">Confirm Delete</h3>
+                <p class="mt-2 text-gray-600">Are you sure you want to delete this medicine? This action cannot be undone.</p>
+                <form method="POST" class="mt-4">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="id" id="deleteId">
+                    <div class="flex items-center justify-between">
+                        <button type="submit" class="bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Delete
+                        </button>
+                        <button type="button" onclick="hideDeleteModal()" class="bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        // Modal functions
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Medicine';
+            document.getElementById('formAction').value = 'add';
+            document.getElementById('medicineForm').reset();
+            document.getElementById('medicineModal').classList.remove('hidden');
+        }
+
+        function showEditModal(medicine) {
+            document.getElementById('modalTitle').textContent = 'Edit Medicine';
+            document.getElementById('formAction').value = 'edit';
+            document.getElementById('medicineId').value = medicine.id;
+            document.getElementById('name').value = medicine.name;
+            document.getElementById('description').value = medicine.description;
+            document.getElementById('quantity').value = medicine.quantity;
+            document.getElementById('price').value = medicine.price;
+            document.getElementById('expiry_date').value = medicine.expiry_date;
+            document.getElementById('medicineModal').classList.remove('hidden');
+        }
+
+        function hideModal() {
+            document.getElementById('medicineModal').classList.add('hidden');
+        }
+
+        function confirmDelete(id) {
+            document.getElementById('deleteId').value = id;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function hideDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const medicineModal = document.getElementById('medicineModal');
+            const deleteModal = document.getElementById('deleteModal');
+            if (event.target === medicineModal) {
+                hideModal();
+            }
+            if (event.target === deleteModal) {
+                hideDeleteModal();
+            }
+        }
+    </script>
 </body>
 </html>
