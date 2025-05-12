@@ -85,23 +85,26 @@ CREATE TABLE IF NOT EXISTS medicines (
 
 
 ---orders & supplier---
+-- Create suppliers table
+CREATE TABLE suppliers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    contact_person VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(50),
+    address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+-- Create orders table
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    supplier VARCHAR(255) NOT NULL,
+    supplier INT NOT NULL,
     medicine VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
     order_date DATE NOT NULL,
     expected_delivery DATE NOT NULL,
-    status ENUM('pending', 'processing', 'delivered', 'cancelled') DEFAULT 'pending'
-);
-
-
-
-
-CREATE TABLE suppliers (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    contact VARCHAR(100),
-    address TEXT
+    status ENUM('pending', 'processing', 'delivered', 'cancelled') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (supplier) REFERENCES suppliers(id)
 );
