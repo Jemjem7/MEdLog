@@ -56,3 +56,22 @@ CREATE TABLE users (
 -- Insert a sample user (password is 'admin123' hashed using bcrypt)
 INSERT INTO users (name, email, password) 
 VALUES ('Doctor', 'doctor@gmail.com', '$2y$10$Vw9zrZXGzA18FUd6V.0mI9a1l.h0uRUgIbPcu6DW.9H.CYa5rH.O');
+
+
+
+
+
+-- for medicine inventory--
+
+CREATE DATABASE IF NOT EXISTS medlog_db;
+
+USE medlog_db;
+
+CREATE TABLE IF NOT EXISTS medicines (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    minimum_stock INT NOT NULL,
+    expiry_date DATE NOT NULL,
+    category VARCHAR(100) NOT NULL
+);
