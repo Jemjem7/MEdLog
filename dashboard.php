@@ -269,22 +269,32 @@ $prescriptions = $_SESSION['prescriptions'];
     <!-- Dashboard Content -->
     <main class="p-6">
       <!-- KPI Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <!-- Total Patients -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="text-gray-500">Total Patients</p>
-              <h3 class="text-2xl font-bold mt-1">1,248</h3>
-              <p class="text-green-500 text-sm mt-2 flex items-center">
-                <i class="fas fa-arrow-up mr-1"></i> 12% from last month
-              </p>
-            </div>
-            <div class="bg-green-100 p-3 rounded-full">
-              <i class="fas fa-user-friends text-green-600"></i>
-            </div>
-          </div>
-        </div>
+      <?php
+// ...existing code...
+// Query to get the total number of unique patients from prescriptions
+$totalPatientsResult = $conn->query("SELECT COUNT(DISTINCT patient_name) AS total FROM prescriptions");
+$totalPatients = 0;
+if ($totalPatientsResult && $row = $totalPatientsResult->fetch_assoc()) {
+    $totalPatients = $row['total'];
+}
+?>
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+  <!-- Total Patients -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="text-gray-500">Total Patients</p>
+        <h3 class="text-2xl font-bold mt-1"><?php echo number_format($totalPatients); ?></h3>
+        <p class="text-green-500 text-sm mt-2 flex items-center">
+          <i class="fas fa-arrow-up mr-1"></i> Real-time count
+        </p>
+      </div>
+      <div class="bg-green-100 p-3 rounded-full">
+        <i class="fas fa-user-friends text-green-600"></i>
+      </div>
+    </div>
+  </div>
 
         <!-- Today's Appointments -->
         <div class="bg-white rounded-lg shadow p-6">
@@ -690,6 +700,10 @@ $prescriptions = $_SESSION['prescriptions'];
     });
   }
 
+
+
+
+  
   // Delete prescription
   function deletePrescription(index) {
     let prescriptions = JSON.parse(localStorage.getItem("prescriptions")) || [];
