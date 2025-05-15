@@ -44,11 +44,11 @@ $settings = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$settings) {
     $stmt = $conn->prepare("INSERT INTO system_settings (currency, date_format, timezone, low_stock_threshold, expiry_alert_days) 
         VALUES (?, ?, ?, ?, ?)");
-    $stmt->execute(['USD', 'Y-m-d', 'UTC', 10, 30]);
+    $stmt->execute(['PHP', 'Y-m-d', 'Asia/Manolo fortich Bukidnon', 10, 30]);
     $settings = [
-        'currency' => 'USD',
+        'currency' => 'PHP',
         'date_format' => 'Y-m-d',
-        'timezone' => 'UTC',
+        'timezone' => 'Asia/Manila',
         'low_stock_threshold' => 10,
         'expiry_alert_days' => 30
     ];
@@ -114,9 +114,7 @@ if (!$settings) {
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
                                 <select name="currency" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
-                                    <option value="USD" <?php echo $settings['currency'] == 'USD' ? 'selected' : ''; ?>>USD ($)</option>
-                                    <option value="EUR" <?php echo $settings['currency'] == 'EUR' ? 'selected' : ''; ?>>EUR (€)</option>
-                                    <option value="GBP" <?php echo $settings['currency'] == 'GBP' ? 'selected' : ''; ?>>GBP (£)</option>
+                                    <option value="PHP" <?php echo $settings['currency'] == 'PHP' ? 'selected' : ''; ?>>PHP (₱)</option>
                                 </select>
                             </div>
                             
@@ -132,11 +130,8 @@ if (!$settings) {
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
                                 <select name="timezone" class="w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500">
-                                    <option value="UTC" <?php echo $settings['timezone'] == 'UTC' ? 'selected' : ''; ?>>UTC</option>
-                                    <option value="America/New_York" <?php echo $settings['timezone'] == 'America/New_York' ? 'selected' : ''; ?>>Eastern Time</option>
-                                    <option value="America/Chicago" <?php echo $settings['timezone'] == 'America/Chicago' ? 'selected' : ''; ?>>Central Time</option>
-                                    <option value="America/Denver" <?php echo $settings['timezone'] == 'America/Denver' ? 'selected' : ''; ?>>Mountain Time</option>
-                                    <option value="America/Los_Angeles" <?php echo $settings['timezone'] == 'America/Los_Angeles' ? 'selected' : ''; ?>>Pacific Time</option>
+                                    <option value="Asia/Manolo fortichBukidnon" <?php echo $settings['timezone'] == 'Asia/Manolo fortich Bukidnon' ? 'selected' : ''; ?>>Asia/Manolo Fortich Bukidnon</option>
+                                   
                                 </select>
                             </div>
                             
@@ -221,4 +216,4 @@ if (!$settings) {
         });
     </script>
 </body>
-</html> 
+</html>
