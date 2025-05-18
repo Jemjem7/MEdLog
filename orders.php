@@ -51,7 +51,7 @@
     $servername = "localhost";
     $username = "root";
     $password = "";
-    $dbname = "medlog_db";
+    $dbname = "medlog";
 
     try {
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
