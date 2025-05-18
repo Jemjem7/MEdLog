@@ -89,6 +89,11 @@
     $stmt = $conn->query($sql);
     $top_medicines = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    $sql = "SELECT id, name FROM suppliers ORDER BY name ASC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $suppliers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     if (isset($_POST['edit_supplier'])) {
         $id = $_POST['supplier_id'];
         $name = $_POST['supplier_name'];
@@ -109,6 +114,9 @@
             ':phone' => $phone,
             ':address' => $address
         ]);
+
+        header("Location: orders.php");
+        exit();
     }
     ?>
 
@@ -386,6 +394,19 @@
                 mainContent.classList.remove('md:ml-64');
             }
         });
+
+        function getSupplierDetails(id) {
+            fetch('get_supplier.php?id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('edit_supplier_id').value = data.id;
+                    document.getElementById('edit_supplier_name').value = data.name;
+                    document.getElementById('edit_contact_person').value = data.contact_person;
+                    document.getElementById('edit_email').value = data.email;
+                    document.getElementById('edit_phone').value = data.phone;
+                    document.getElementById('edit_address').value = data.address;
+                });
+        }
     </script>
 </body>
 </html> 

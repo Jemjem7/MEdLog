@@ -474,26 +474,26 @@
                 <form method="POST" class="space-y-4">
                     <input type="hidden" name="supplier_id" id="edit_supplier_id">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Supplier Name</label>
-                        <input type="text" name="supplier_name" id="edit_supplier_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+                        <label>Supplier Name</label>
+                        <input type="text" name="supplier_name" id="edit_supplier_name" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Contact Person</label>
-                        <input type="text" name="contact_person" id="edit_contact_person" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+                        <label>Contact Person</label>
+                        <input type="text" name="contact_person" id="edit_contact_person">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" name="email" id="edit_email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+                        <label>Email</label>
+                        <input type="email" name="email" id="edit_email">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Phone</label>
-                        <input type="tel" name="phone" id="edit_phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required>
+                        <label>Phone</label>
+                        <input type="tel" name="phone" id="edit_phone">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Address</label>
-                        <textarea name="address" id="edit_address" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500" required></textarea>
+                        <label>Address</label>
+                        <input type="text" name="address" id="edit_address">
                     </div>
-                    <div class="flex justify-end space-x-3">
+                    <div class="flex justify-end">
                         <button type="button" onclick="hideEditSupplierModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
                             Cancel
                         </button>
@@ -562,7 +562,6 @@
         }
 
         function editSupplier(id) {
-            // Fetch supplier data using AJAX
             fetch('get_supplier.php?id=' + id)
                 .then(response => response.json())
                 .then(data => {
@@ -572,7 +571,6 @@
                     document.getElementById('edit_email').value = data.email;
                     document.getElementById('edit_phone').value = data.phone;
                     document.getElementById('edit_address').value = data.address;
-                    
                     document.getElementById('editSupplierModal').classList.remove('hidden');
                     document.getElementById('editSupplierModal').classList.add('flex');
                 });
