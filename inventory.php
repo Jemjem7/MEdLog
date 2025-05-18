@@ -1,7 +1,7 @@
 <?php
 // Database configuration
 $host = "localhost";
-$db = "medlog_db";
+$db = "medlog";
 $user = "root";
 $pass = "";
 

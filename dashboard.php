@@ -101,6 +101,13 @@ $appointmentsCount = array_map(fn($day) => $appointmentsData[$day] ?? 0, range(1
 
 
 $prescriptions = $_SESSION['prescriptions'];
+
+// Get total medicines
+$totalMedicinesResult = $conn->query("SELECT COUNT(*) AS total FROM medicines");
+$totalMedicines = 0;
+if ($totalMedicinesResult && $row = $totalMedicinesResult->fetch_assoc()) {
+    $totalMedicines = $row['total'];
+}
 ?>
 
 
@@ -333,7 +340,7 @@ if ($totalPatientsResult && $row = $totalPatientsResult->fetch_assoc()) {
           <div class="flex justify-between items-start">
             <div>
               <p class="text-gray-500">Revenue</p>
-              <h3 class="text-2xl font-bold mt-1">₱15,420.75</h3>
+              <h3 class="text-2xl font-bold mt-1">₱</h3>
               <p class="text-gray-500 text-sm mt-2 flex items-center">
                 <i class="fas fa-sync-alt mr-1"></i> Updated real-time
               </p>
@@ -341,7 +348,7 @@ if ($totalPatientsResult && $row = $totalPatientsResult->fetch_assoc()) {
             <div class="bg-purple-100 p-3 rounded-full">
               <i class="fas fa-money-bill-wave text-purple-600"></i>
             </div>
-          </div>
+    15,420.75      </div>
         </div>
       </div>
 
@@ -368,7 +375,7 @@ if ($totalPatientsResult && $row = $totalPatientsResult->fetch_assoc()) {
           <div class="flex justify-between items-start">
             <div>
               <p class="text-gray-500">Total Medicine Inventory</p>
-              <h3 class="text-2xl font-bold mt-1">142</h3>
+              <h3 class="text-2xl font-bold mt-1"><?php echo number_format($totalMedicines); ?></h3>
               <p class="text-gray-500 text-sm mt-2 flex items-center">
                 <i class="fas fa-pills mr-1"></i> Inventory monitored
               </p>
