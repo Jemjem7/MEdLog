@@ -88,6 +88,28 @@
             LIMIT 5";
     $stmt = $conn->query($sql);
     $top_medicines = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (isset($_POST['edit_supplier'])) {
+        $id = $_POST['supplier_id'];
+        $name = $_POST['supplier_name'];
+        $contact_person = $_POST['contact_person'];
+        $email = $_POST['email'];
+        $phone = $_POST['phone'];
+        $address = $_POST['address'];
+
+        $sql = "UPDATE suppliers SET name = :name, contact_person = :contact_person, 
+                email = :email, phone = :phone, address = :address 
+                WHERE id = :id";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':id' => $id,
+            ':name' => $name,
+            ':contact_person' => $contact_person,
+            ':email' => $email,
+            ':phone' => $phone,
+            ':address' => $address
+        ]);
+    }
     ?>
 
     <!-- Sidebar -->
